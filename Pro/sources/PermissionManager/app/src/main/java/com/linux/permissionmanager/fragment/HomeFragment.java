@@ -243,15 +243,15 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         String sdkVer = NativeBridge.getSdkVersion();
 
         if(curState.indexOf("NotInstalled") != -1) {
-            appendConsoleMsg("SKRoot环境未安装！");
+            appendConsoleMsg("X-KRoot环境未安装！");
         } else if(curState.indexOf("Fault") != -1) {
-            appendConsoleMsg("SKRoot环境出现故障，核心版本：" + installedVer);
+            appendConsoleMsg("X-KRoot环境出现故障，核心版本：" + installedVer);
         } else if(curState.indexOf("Running") != -1) {
             if (sdkVer.equals(installedVer)) {  
-                appendConsoleMsg("SKRoot环境运行中，核心版本：" + installedVer);
+                appendConsoleMsg("X-KRoot环境运行中，核心版本：" + installedVer);
             } else {
-                appendConsoleMsg("SKRoot环境运行中，核心版本：" + installedVer + "，版本太低，请升级！");
-                appendConsoleMsg("升级方法：重新点击“安装SKRoot环境”按钮。");
+                appendConsoleMsg("X-KRoot环境运行中，核心版本：" + installedVer + "，版本太低，请升级！");
+                appendConsoleMsg("升级方法：重新点击“安装环境”按钮。");
             }
         }
     }
@@ -278,7 +278,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         DialogUtils.showCustomDialog(
                 mActivity,
                 "确认",
-                "确定要卸载SKRoot环境吗？这会同时清空 SU 授权列表和删除已安装的模块",
+                "确定要卸载X-KRoot环境吗？这会同时清空 SU 授权列表和删除已安装的模块",
                 null,
                 "确定", (dialog, which) -> {
                     dialog.dismiss();

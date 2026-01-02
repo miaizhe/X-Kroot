@@ -8,7 +8,7 @@ android {
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.linux.permissionmanager"
+        applicationId "com.linux.xroot"
         minSdk 26
         targetSdk 33
         versionCode 1

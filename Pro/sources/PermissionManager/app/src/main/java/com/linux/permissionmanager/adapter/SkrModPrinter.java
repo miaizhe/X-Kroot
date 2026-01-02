@@ -7,7 +7,7 @@ import com.linux.permissionmanager.model.SkrModItem;
 public final class SkrModPrinter {
     public static String buildModuleMeta(SkrModItem m) {
         StringBuilder sb = new StringBuilder(256);
-        sb.append("----- SKRoot 模块详情 -----\n");
+        sb.append("----- X-KRoot 模块详情 -----\n");
         sb.append("名称：").append(nvl(m.getName())).append('\n');
         sb.append("版本：").append(nvl(m.getVer())).append('\n');
         sb.append("描述：").append(nvl(m.getDesc())).append('\n');

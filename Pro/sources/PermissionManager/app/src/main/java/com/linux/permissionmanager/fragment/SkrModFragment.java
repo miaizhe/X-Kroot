@@ -199,7 +199,7 @@ public class SkrModFragment extends Fragment {
     public void onAddSkrMod(String zipFilePath) {
         String tip = NativeBridge.installSkrootModule(mRootKey, zipFilePath);
         if(tip.indexOf("OK") != -1) tip += "，重启后生效";
-        if(tip.indexOf("ERR_MODULE_REQUIRE_MIN_SDK") != -1) tip += "，当前SKRoot环境版本太低，请先升级SKRoot";
+        if(tip.indexOf("ERR_MODULE_REQUIRE_MIN_SDK") != -1) tip += "，当前X-KRoot环境版本太低，请先升级X-KRoot";
         if(tip.indexOf("ERR_MODULE_SDK_TOO_OLD") != -1) tip += "，该模块SDK版本太低，已不支持安装";
         DialogUtils.showMsgDlg(mActivity, "执行结果", tip, null);
         setupSkrModRecyclerView();

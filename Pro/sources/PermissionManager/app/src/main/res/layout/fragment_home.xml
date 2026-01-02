@@ -304,7 +304,7 @@
                         android:fontFamily="monospace"
                         android:gravity="top"
                         android:padding="8dp"
-                        android:text="SKRoot Console Initialized...\n"
+                        android:text="X-KRoot Console Initialized...\n"
                         android:textColor="#00FF00"
                         android:textSize="12sp" />
 

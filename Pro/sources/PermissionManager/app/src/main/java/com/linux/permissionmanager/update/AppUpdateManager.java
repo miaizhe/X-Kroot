@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 public class AppUpdateManager {
 
     private final Activity activity;
-    private final String updateJsonUrl = "https://abcz316.github.io/SKRoot-linuxKernelRoot/skroot_pro_app/update.json";
+    private final String updateJsonUrl = "https://abcz316.github.io/X-KRoot-linuxKernelRoot/xkroot_pro_app/update.json";
 
     public AppUpdateManager(Activity activity) {
         this.activity = activity;

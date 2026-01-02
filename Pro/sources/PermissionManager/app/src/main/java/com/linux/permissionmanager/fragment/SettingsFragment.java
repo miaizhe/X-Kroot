@@ -603,7 +603,7 @@ public class SettingsFragment extends Fragment {
     }
 
     private void initLink() {
-        mTvLink.setText("https://github.com/abcz316/SKRoot-linuxKernelRoot");
+        mTvLink.setText("https://github.com/X-KRoot/X-KRoot");
         mTvLink.setOnClickListener(v -> {
             UrlIntentUtils.openUrl(mActivity, mTvLink.getText().toString());
         });

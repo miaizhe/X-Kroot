@@ -502,14 +502,14 @@
                     style="@style/LargeText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="SKRoot (Pro)" />
+                    android:text="X-KRoot" />
 
                 <TextView
                     style="@style/MediumText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="新一代内核级 Root 解决方案，支持热修改 Hook 内核，完美隐藏 Root 权限，无感运行。" />
+                    android:text="X-KRoot 是一个基于 Linux 内核的 Root 方案，旨在提供更安全、更高效的权限管理体验。" />
 
                 <com.google.android.material.divider.MaterialDivider
                     android:layout_width="match_parent"
@@ -529,9 +529,10 @@
                     style="@style/SmallText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="访问官网"
-                    android:textColor="?attr/colorPrimary" />
+                    android:layout_marginTop="16dp"
+                    android:autoLink="web"
+                    android:text="GitHub: https://github.com/X-KRoot/X-KRoot"
+                    android:textColorLink="?attr/colorPrimary" />
 
                 <com.google.android.material.divider.MaterialDivider
                     android:layout_width="match_parent"

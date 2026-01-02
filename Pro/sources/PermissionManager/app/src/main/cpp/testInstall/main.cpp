@@ -1,4 +1,4 @@
-﻿#include <string.h>
+#include <string.h>
 #include <thread>
 #include <vector>
 #include <map>
@@ -14,13 +14,13 @@ char ROOT_KEY[256] = {0};
 
 void test_install_skroot() {
 	KModErr err = skroot_env::install_skroot_environment(ROOT_KEY);
-    printf("install_skroot_environment: %s\n", to_string(err).c_str());
+    printf("install_X-KRoot_environment: %s\n", to_string(err).c_str());
 	if(is_ok(err)) printf("将在重启后生效\n");
 }
 
 void test_uninstall_skroot() {
 	KModErr err = skroot_env::uninstall_skroot_environment(ROOT_KEY);
-    printf("uninstall_skroot_environment: %s\n", to_string(err).c_str());
+    printf("uninstall_X-KRoot_environment: %s\n", to_string(err).c_str());
 	if(is_ok(err)) printf("将在重启后生效\n");
 }
 
@@ -32,24 +32,24 @@ void test_show_skroot_state() {
         {SkrootEnvState::Fault,        "Fault"},
     };
 	SkrootEnvState state = skroot_env::get_skroot_environment_state(ROOT_KEY);
-    printf("get_skroot_environment_state: %s\n", m[state]);
+    printf("get_X-KRoot_environment_state: %s\n", m[state]);
 }
 
 void test_show_skroot_ver() {
 	skroot_env::SkrootSdkVersion ver;
 	KModErr err = skroot_env::get_installed_skroot_environment_version(ROOT_KEY, ver);
 	if(is_failed(err)) {
-		printf("get_installed_skroot_environment_version err: %s\n", to_string(err).c_str());
+		printf("get_installed_X-KRoot_environment_version err: %s\n", to_string(err).c_str());
 		return;
 	}
-    printf("get_installed_skroot_environment_version: %s, %d.%d.%d\n", to_string(err).c_str(), ver.major, ver.minor, ver.patch);
+    printf("get_installed_X-KRoot_environment_version: %s, %d.%d.%d\n", to_string(err).c_str(), ver.major, ver.minor, ver.patch);
 }
 
 void test_show_skroot_log() {
 	std::string log;
 	KModErr err = skroot_env::read_skroot_log(ROOT_KEY, log);
     printf("%s\n", log.c_str());
-    printf("read_skroot_log: %s\n", to_string(err).c_str());
+    printf("read_X-KRoot_log: %s\n", to_string(err).c_str());
 }
 
 void test_root() {
@@ -132,7 +132,7 @@ static void print_sep(char c) {
     std::putchar('\n');
 }
 static void print_desc_info(const skroot_env::module_desc& desc) {
-    printf("----- SKRoot Module Meta -----\n");
+    printf("----- X-KRoot Module Meta -----\n");
     printf("Name    : %s\n", desc.name);
     printf("Version : %s\n", desc.version);
     printf("Desc    : %s\n", desc.desc);
@@ -186,16 +186,16 @@ void test_open_module_web_ui(const char* mod_uuid) {
 int main(int argc, char* argv[]) {
 	printf(
 		"=======================================================\n"
-		"本工具名称: SKRoot(Pro) - Linux内核级完美隐藏ROOT演示\n"
+		"本工具名称: X-KRoot(Pro) - Linux内核级完美隐藏ROOT演示\n"
 		"用法总览:\n"
 		"testInstall <command> [args...]\n"
 		"---------------------- 基础环境 ----------------------\n");
 
-	printf("%-29s %s\n", "install", "安装 SKRoot 环境");
-	printf("%-29s %s\n", "uninstall", "卸载 SKRoot 环境");
-	printf("%-29s %s\n", "show-state", "获取当前 SKRoot 环境状态");
-	printf("%-29s %s\n", "show-ver", "查看已安装 SKRoot 版本");
-	printf("%-29s %s\n\n", "show-log", "查看 SKRoot 开机日志");
+	printf("%-29s %s\n", "install", "安装 X-KRoot 环境");
+	printf("%-29s %s\n", "uninstall", "卸载 X-KRoot 环境");
+	printf("%-29s %s\n", "show-state", "获取当前 X-KRoot 环境状态");
+	printf("%-29s %s\n", "show-ver", "查看已安装 X-KRoot 版本");
+	printf("%-29s %s\n\n", "show-log", "查看 X-KRoot 开机日志");
 
 	printf("------------------ 权限测试与执行 ------------------\n");
 	printf("%-29s %s\n", "test", "测试 ROOT 权限");
@@ -209,15 +209,15 @@ int main(int argc, char* argv[]) {
 	printf("%-29s %s\n\n", "su-list clear", "清空 SU 授权列表");
 
 	printf("---------------------- 模块管理 ----------------------\n");
-	printf("%-29s %s\n", "module add <zip_file_path>", "添加 SKRoot 模块");
-	printf("%-29s %s\n", "module remove <mod_uuid>", "移除 SKRoot 模块");
-	printf("%-29s %s\n", "module list", "显示 SKRoot 模块列表");
-	printf("%-29s %s\n\n", "module desc <zip_file_path>", "解析 SKRoot 模块的描述信息");
-	printf("%-29s %s\n\n", "module webui <mod_uuid>", "打开 SKRoot 模块 WebUI 页面");
+	printf("%-29s %s\n", "module add <zip_file_path>", "添加 X-KRoot 模块");
+	printf("%-29s %s\n", "module remove <mod_uuid>", "移除 X-KRoot 模块");
+	printf("%-29s %s\n", "module list", "显示 X-KRoot 模块列表");
+	printf("%-29s %s\n\n", "module desc <zip_file_path>", "解析 X-KRoot 模块的描述信息");
+	printf("%-29s %s\n\n", "module webui <mod_uuid>", "打开 X-KRoot 模块 WebUI 页面");
 
 	printf("-------------------------------------------------------\n"
 		"本工具特点：\n"
-		"新一代SKRoot，跟面具完全不同思路，摆脱面具被检测的弱点，完美隐藏root功能，兼容安卓APP直接JNI稳定调用。\n"
+		"新一代X-KRoot，跟面具完全不同思路，摆脱面具被检测的弱点，完美隐藏root功能，兼容安卓APP直接JNI稳定调用。\n"
 		"如需帮助，请使用对应的命令，或者查看上面的菜单。\n\n");
 	++argv;
 	--argc;

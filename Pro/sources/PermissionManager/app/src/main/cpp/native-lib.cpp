@@ -72,7 +72,7 @@ Java_com_linux_permissionmanager_bridge_NativeBridge_installSkrootEnv(
 
     KModErr err = skroot_env::install_skroot_environment(strRootKey.c_str());
     stringstream sstr;
-    sstr << "install_skroot_environment: " << to_string(err).c_str();
+    sstr << "install_X-KRoot_environment: " << to_string(err).c_str();
 	if(is_ok(err)) sstr  << "，将在重启后生效";
     return env->NewStringUTF(sstr.str().c_str());
 }
@@ -86,7 +86,7 @@ Java_com_linux_permissionmanager_bridge_NativeBridge_uninstallSkrootEnv(
 
     KModErr err = skroot_env::uninstall_skroot_environment(strRootKey.c_str());
     stringstream sstr;
-    sstr << "uninstall_skroot_environment: " << to_string(err).c_str();
+    sstr << "uninstall_X-KRoot_environment: " << to_string(err).c_str();
 	if(is_ok(err)) sstr  << "，将在重启后生效";
     return env->NewStringUTF(sstr.str().c_str());
 }
@@ -197,11 +197,11 @@ Java_com_linux_permissionmanager_bridge_NativeBridge_removeSuAuth(
         JNIEnv* env,
         jclass /* this */,
         jstring rootKey,
-        jstring modUuid) {
+        jstring appPackageName) {
     string strRootKey = jstringToStr(env, rootKey);
-    string strModUuid = jstringToStr(env, modUuid);
+    string strAppPackageName = jstringToStr(env, appPackageName);
 
-    KModErr err = skroot_env::remove_su_auth_list(strRootKey.c_str(), strModUuid.c_str());
+    KModErr err = skroot_env::remove_su_auth_list(strRootKey.c_str(), strAppPackageName.c_str());
     stringstream sstr;
     sstr << "remove_su_auth_list: " << to_string(err).c_str();
     return env->NewStringUTF(sstr.str().c_str());
@@ -257,8 +257,8 @@ Java_com_linux_permissionmanager_bridge_NativeBridge_installSkrootModule(
     string reason;
     KModErr err = skroot_env::install_module(strRootKey.c_str(), strZipFilePath.c_str(), reason);
     stringstream sstr;
-    if(is_ok(err)) sstr << "install_module: " << to_string(err).c_str();
-    else sstr << "install_module: " << to_string(err).c_str() << ", reason: " << reason.c_str();
+    if(is_ok(err)) sstr << "install_X-KRoot_module: " << to_string(err).c_str();
+    else sstr << "install_X-KRoot_module: " << to_string(err).c_str() << ", reason: " << reason.c_str();
     return env->NewStringUTF(sstr.str().c_str());
 }
 
@@ -275,7 +275,7 @@ Java_com_linux_permissionmanager_bridge_NativeBridge_uninstallSkrootModule(
 
     KModErr err = skroot_env::uninstall_module(strRootKey.c_str(), strModUuid.c_str());
     stringstream sstr;
-    sstr << "uninstall_module: " << to_string(err).c_str();
+    sstr << "uninstall_X-KRoot_module: " << to_string(err).c_str();
     return env->NewStringUTF(sstr.str().c_str());
 }
 
@@ -291,7 +291,7 @@ Java_com_linux_permissionmanager_bridge_NativeBridge_getSkrootModuleList(
     vector<skroot_env::module_desc> list;
     KModErr err = skroot_env::get_all_modules_list(strRootKey.c_str(), list, runningOnly ? skroot_env::ModuleListMode::RunningOnly : skroot_env::ModuleListMode::All);
     if(is_failed(err)) {
-        ss << "get_all_modules_list: " << to_string(err).c_str();
+        ss << "get_all_X-KRoot_modules_list: " << to_string(err).c_str();
         return env->NewStringUTF(ss.str().c_str());
     }
 
@@ -322,7 +322,7 @@ Java_com_linux_permissionmanager_bridge_NativeBridge_parseSkrootModuleDesc(
         ss << cJSON_Print(root);
         cJSON_Delete(root);
     } else {
-        ss << "parse_module_desc_from_zip_file: " << to_string(err).c_str();
+        ss << "parse_X-KRoot_module_desc: " << to_string(err).c_str();
     }
     return env->NewStringUTF(ss.str().c_str());
 
@@ -340,7 +340,7 @@ Java_com_linux_permissionmanager_bridge_NativeBridge_openSkrootModuleWebUI(
     int port = 0;
     KModErr err = skroot_env::features::web_ui::start_module_web_ui_server_async(strRootKey.c_str(), strModUuid.c_str(), port);
     stringstream sstr;
-    sstr << "start_module_web_ui_server_async: " << to_string(err).c_str() << ", port:" << port;
+    sstr << "start_xkroot_module_web_ui_server: " << to_string(err).c_str() << ", port:" << port;
     return env->NewStringUTF(sstr.str().c_str());
 }
 
@@ -389,7 +389,7 @@ Java_com_linux_permissionmanager_bridge_NativeBridge_testSkrootBasics(
     string info;
     KModErr err = skroot_env::test_skroot_basics(strRootKey.c_str(), basicItem, info);
     sstr << info.c_str() << "\n";
-    sstr << "Test " << strItem.c_str() <<": " << to_string(err).c_str();
+    sstr << "test_xkroot_basics: " << strItem.c_str() << ": " << to_string(err).c_str();
     return env->NewStringUTF(sstr.str().c_str());
 }
 
@@ -411,7 +411,7 @@ Java_com_linux_permissionmanager_bridge_NativeBridge_testSkrootDefaultModule(
     string info;
     KModErr err = skroot_env::test_skroot_deafult_module(strRootKey.c_str(), defName, info);
     sstr << info.c_str() << "\n";
-    sstr << "Test " << strName.c_str() <<": " << to_string(err).c_str();
+    sstr << "test_xkroot_deafult_module: " << strName.c_str() <<": " << to_string(err).c_str();
     return env->NewStringUTF(sstr.str().c_str());
 }
 
@@ -425,9 +425,8 @@ Java_com_linux_permissionmanager_bridge_NativeBridge_setSkrootLogEnabled(
     string strRootKey = jstringToStr(env, rootKey);
 
     KModErr err = skroot_env::set_skroot_log_enabled(strRootKey.c_str(), enable);
-
     stringstream sstr;
-    sstr << "set_skroot_log_enabled: " << to_string(err).c_str();
+    sstr << "set_X-KRoot_log_enabled: " << to_string(err).c_str();
     return env->NewStringUTF(sstr.str().c_str());
 }
 
