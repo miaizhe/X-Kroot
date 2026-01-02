@@ -167,6 +167,14 @@ public class ThemeUtils {
                     iv.setImageTintList(csl);
                 }
             }
+        } else if (view != null && view.getId() != View.NO_ID) {
+            // 额外处理自定义 ID 模式的视图
+            try {
+                String idName = view.getResources().getResourceEntryName(view.getId());
+                if (idName.contains("music_bar_")) {
+                    view.setBackgroundColor(color);
+                }
+            } catch (Exception ignored) {}
         }
 
         if (view instanceof ViewGroup) {

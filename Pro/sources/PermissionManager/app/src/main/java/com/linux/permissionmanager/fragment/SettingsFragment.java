@@ -62,6 +62,7 @@ public class SettingsFragment extends Fragment {
     private Button mBtnPickBgMusic;
     private Button mBtnClearBgMusic;
     private MaterialSwitch mSwitchShowLyrics;
+    private MaterialSwitch mSwitchMusicVisualizer;
     private MaterialSwitch mSwitchAdaptiveBg;
     private TextView mTvLyricFileStatus;
     private Button mBtnPickLyricFile;
@@ -111,6 +112,7 @@ public class SettingsFragment extends Fragment {
         mBtnPickBgMusic = view.findViewById(R.id.pick_bg_music_btn);
         mBtnClearBgMusic = view.findViewById(R.id.clear_bg_music_btn);
         mSwitchShowLyrics = view.findViewById(R.id.show_lyrics_switch);
+        mSwitchMusicVisualizer = view.findViewById(R.id.music_visualizer_switch);
         mSwitchAdaptiveBg = view.findViewById(R.id.adaptive_bg_switch);
         mTvLyricFileStatus = view.findViewById(R.id.lyric_file_status_tv);
         mBtnPickLyricFile = view.findViewById(R.id.pick_lyric_file_btn);
@@ -176,6 +178,11 @@ public class SettingsFragment extends Fragment {
         mSwitchShowLyrics.setChecked(AppSettings.getBoolean("show_lyrics", false));
         mSwitchShowLyrics.setOnCheckedChangeListener((v, isChecked) -> {
             AppSettings.setBoolean("show_lyrics", isChecked);
+        });
+
+        mSwitchMusicVisualizer.setChecked(AppSettings.getBoolean("show_music_visualizer", false));
+        mSwitchMusicVisualizer.setOnCheckedChangeListener((v, isChecked) -> {
+            AppSettings.setBoolean("show_music_visualizer", isChecked);
         });
 
         mSwitchAdaptiveBg.setChecked(AppSettings.getBoolean("adaptive_background", false));
@@ -391,6 +398,14 @@ public class SettingsFragment extends Fragment {
         ThemeUtils.applyToViewTree(getView(), ThemeUtils.getThemeColor());
         // Also refresh color picker to show current selected color
         initThemeColorPicker();
+        
+        // 如果在 MainActivity 中，也通知其他 Fragment 刷新
+        if (mActivity instanceof MainActivity) {
+            MainActivity main = (MainActivity) mActivity;
+            if (main.mHomeFragm != null && main.mHomeFragm.isAdded()) {
+                main.mHomeFragm.refreshTheme();
+            }
+        }
     }
 
     private void showSelectTestSkrootBasicsDlg() {

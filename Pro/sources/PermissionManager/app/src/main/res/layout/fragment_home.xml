@@ -337,4 +337,38 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
+    <!-- 音乐律动沉浸式布局：全屏宽度 -->
+    <LinearLayout
+        android:id="@+id/music_visualizer_container"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_gravity="bottom"
+        android:gravity="bottom"
+        android:orientation="horizontal"
+        android:paddingBottom="4dp"
+        android:visibility="gone">
+
+        <!-- 20个律动条铺满屏幕宽度 -->
+        <View android:id="@+id/music_bar_1" android:layout_width="0dp" android:layout_height="12dp" android:layout_weight="1" android:layout_margin="1dp" android:background="@color/primary" android:alpha="0.6" />
+        <View android:id="@+id/music_bar_2" android:layout_width="0dp" android:layout_height="12dp" android:layout_weight="1" android:layout_margin="1dp" android:background="@color/primary" android:alpha="0.6" />
+        <View android:id="@+id/music_bar_3" android:layout_width="0dp" android:layout_height="12dp" android:layout_weight="1" android:layout_margin="1dp" android:background="@color/primary" android:alpha="0.6" />
+        <View android:id="@+id/music_bar_4" android:layout_width="0dp" android:layout_height="12dp" android:layout_weight="1" android:layout_margin="1dp" android:background="@color/primary" android:alpha="0.6" />
+        <View android:id="@+id/music_bar_5" android:layout_width="0dp" android:layout_height="12dp" android:layout_weight="1" android:layout_margin="1dp" android:background="@color/primary" android:alpha="0.6" />
+        <View android:id="@+id/music_bar_6" android:layout_width="0dp" android:layout_height="12dp" android:layout_weight="1" android:layout_margin="1dp" android:background="@color/primary" android:alpha="0.6" />
+        <View android:id="@+id/music_bar_7" android:layout_width="0dp" android:layout_height="12dp" android:layout_weight="1" android:layout_margin="1dp" android:background="@color/primary" android:alpha="0.6" />
+        <View android:id="@+id/music_bar_8" android:layout_width="0dp" android:layout_height="12dp" android:layout_weight="1" android:layout_margin="1dp" android:background="@color/primary" android:alpha="0.6" />
+        <View android:id="@+id/music_bar_9" android:layout_width="0dp" android:layout_height="12dp" android:layout_weight="1" android:layout_margin="1dp" android:background="@color/primary" android:alpha="0.6" />
+        <View android:id="@+id/music_bar_10" android:layout_width="0dp" android:layout_height="12dp" android:layout_weight="1" android:layout_margin="1dp" android:background="@color/primary" android:alpha="0.6" />
+        <View android:id="@+id/music_bar_11" android:layout_width="0dp" android:layout_height="12dp" android:layout_weight="1" android:layout_margin="1dp" android:background="@color/primary" android:alpha="0.6" />
+        <View android:id="@+id/music_bar_12" android:layout_width="0dp" android:layout_height="12dp" android:layout_weight="1" android:layout_margin="1dp" android:background="@color/primary" android:alpha="0.6" />
+        <View android:id="@+id/music_bar_13" android:layout_width="0dp" android:layout_height="12dp" android:layout_weight="1" android:layout_margin="1dp" android:background="@color/primary" android:alpha="0.6" />
+        <View android:id="@+id/music_bar_14" android:layout_width="0dp" android:layout_height="12dp" android:layout_weight="1" android:layout_margin="1dp" android:background="@color/primary" android:alpha="0.6" />
+        <View android:id="@+id/music_bar_15" android:layout_width="0dp" android:layout_height="12dp" android:layout_weight="1" android:layout_margin="1dp" android:background="@color/primary" android:alpha="0.6" />
+        <View android:id="@+id/music_bar_16" android:layout_width="0dp" android:layout_height="12dp" android:layout_weight="1" android:layout_margin="1dp" android:background="@color/primary" android:alpha="0.6" />
+        <View android:id="@+id/music_bar_17" android:layout_width="0dp" android:layout_height="12dp" android:layout_weight="1" android:layout_margin="1dp" android:background="@color/primary" android:alpha="0.6" />
+        <View android:id="@+id/music_bar_18" android:layout_width="0dp" android:layout_height="12dp" android:layout_weight="1" android:layout_margin="1dp" android:background="@color/primary" android:alpha="0.6" />
+        <View android:id="@+id/music_bar_19" android:layout_width="0dp" android:layout_height="12dp" android:layout_weight="1" android:layout_margin="1dp" android:background="@color/primary" android:alpha="0.6" />
+        <View android:id="@+id/music_bar_20" android:layout_width="0dp" android:layout_height="12dp" android:layout_weight="1" android:layout_margin="1dp" android:background="@color/primary" android:alpha="0.6" />
+    </LinearLayout>
+
 </FrameLayout>

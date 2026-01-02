@@ -47,10 +47,10 @@ public class MainActivity extends AppCompatActivity {
     private MenuItem mMainMenu;
     private MenuItem mMusicMenu;
     private MenuItem mRefreshBgMenu;
-    private HomeFragment mHomeFragm = null;
-    private SuAuthFragment mSuAuthFragm = null;
-    private SkrModFragment mSkrModFragm = null;
-    private SettingsFragment mSettingsFragm = null;
+    public HomeFragment mHomeFragm = null;
+    public SuAuthFragment mSuAuthFragm = null;
+    public SkrModFragment mSkrModFragm = null;
+    public SettingsFragment mSettingsFragm = null;
     
     private final BackgroundMusicManager.OnStateChangedListener musicStateListener = isPlaying -> {
         runOnUiThread(this::updateMusicMenuIcon);
@@ -209,6 +209,9 @@ public class MainActivity extends AppCompatActivity {
                                         ThemeUtils.applyTheme(MainActivity.this);
                                         
                                         // Notify fragments to refresh theme
+                                        if (mHomeFragm != null && mHomeFragm.isAdded()) {
+                                            mHomeFragm.refreshTheme();
+                                        }
                                         if (mSettingsFragm != null && mSettingsFragm.isAdded()) {
                                             mSettingsFragm.refreshAllFragmentsTheme();
                                         }

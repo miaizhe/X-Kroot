@@ -27,7 +27,7 @@
         
         <!-- Navigation bar color. -->
         <item name="android:navigationBarColor">?attr/colorSurface</item>
-        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">true</item>
     </style>
 
     <style name="ModernCard" parent="Widget.Material3.CardView.Elevated">

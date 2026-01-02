@@ -9,8 +9,11 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.animation.ValueAnimator;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -45,7 +48,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private TextView mSuAppCountVal;
     private List<LyricUtils.LyricEntry> mLyrics;
     private String mCurrentLyricUriStr = "";
-    
+
+    private View mMusicVisualizerContainer;
+    private View[] mMusicBars;
+    private java.util.List<ValueAnimator> mVisualizerAnimators = new java.util.ArrayList<>();
+
     private final Handler mLyricUpdateHandler = new Handler();
     private final Runnable mLyricUpdateRunnable = new Runnable() {
         @Override
@@ -90,6 +97,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         mModuleCountVal = view.findViewById(R.id.module_count_val);
         mSuAppCountVal = view.findViewById(R.id.su_app_count_val);
 
+        mMusicVisualizerContainer = view.findViewById(R.id.music_visualizer_container);
+        mMusicBars = new View[20];
+        for (int i = 0; i < 20; i++) {
+            int resId = getResources().getIdentifier("music_bar_" + (i + 1), "id", mActivity.getPackageName());
+            mMusicBars[i] = view.findViewById(resId);
+        }
+
         install_skroot_env_btn.setOnClickListener(this);
         uninstall_skroot_env_btn.setOnClickListener(this);
         test_root_btn.setOnClickListener(this);
@@ -114,7 +128,20 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         mLyricUpdateHandler.post(mLyricUpdateRunnable);
         updateAllCardsAlpha(getView());
         updateKernelInfo();
-        ThemeUtils.applyToViewTree(getView(), ThemeUtils.getThemeColor());
+        
+        int themeColor = ThemeUtils.getThemeColor();
+        ThemeUtils.applyToViewTree(getView(), themeColor);
+        
+        // 更新律动条颜色
+        if (mMusicBars != null) {
+            for (View bar : mMusicBars) {
+                if (bar != null) {
+                    bar.setBackgroundColor(themeColor);
+                }
+            }
+        }
+        
+        updateMusicVisualizerVisibility();
     }
 
     private void updateKernelInfo() {
@@ -164,6 +191,28 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     public void onPause() {
         super.onPause();
         mLyricUpdateHandler.removeCallbacks(mLyricUpdateRunnable);
+        if (mMusicVisualizerContainer != null) {
+            mMusicVisualizerContainer.removeCallbacks(mVisualizerRunnable);
+        }
+        cancelVisualizerAnimations();
+    }
+
+    /**
+     * 立即刷新主题颜色，供外部调用（如 MainActivity 刷新背景时）
+     */
+    public void refreshTheme() {
+        if (getView() == null) return;
+        int themeColor = ThemeUtils.getThemeColor();
+        ThemeUtils.applyToViewTree(getView(), themeColor);
+        
+        // 特别确保律动条颜色更新
+        if (mMusicBars != null) {
+            for (View bar : mMusicBars) {
+                if (bar != null) {
+                    bar.setBackgroundColor(themeColor);
+                }
+            }
+        }
     }
 
     private void updateLyrics() {
@@ -206,6 +255,74 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             }
         }
     }
+
+    private void updateMusicVisualizerVisibility() {
+        if (mMusicVisualizerContainer == null) return;
+
+        boolean enabled = AppSettings.getBoolean("show_music_visualizer", false);
+        String musicUri = AppSettings.getString("background_music_uri", "");
+        BackgroundMusicManager musicManager = BackgroundMusicManager.getInstance(mActivity);
+
+        boolean shouldShow = enabled && !musicUri.isEmpty() && musicManager.isPlaying();
+        mMusicVisualizerContainer.setVisibility(shouldShow ? View.VISIBLE : View.GONE);
+
+        if (shouldShow) {
+            animateMusicBars();
+        }
+    }
+
+    private void cancelVisualizerAnimations() {
+        for (ValueAnimator animator : mVisualizerAnimators) {
+            if (animator != null) {
+                animator.cancel();
+            }
+        }
+        mVisualizerAnimators.clear();
+    }
+
+    private void animateMusicBars() {
+        if (mMusicBars == null || mMusicBars.length == 0) return;
+
+        // 取消之前的动画以确保平滑切换
+        cancelVisualizerAnimations();
+
+        int minHeight = (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics());
+        int maxHeight = (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 56, getResources().getDisplayMetrics());
+
+        for (View bar : mMusicBars) {
+            if (bar == null) continue;
+
+            int currentHeight = bar.getHeight();
+            if (currentHeight <= 0) currentHeight = minHeight;
+            int targetHeight = minHeight + (int) (Math.random() * (maxHeight - minHeight));
+
+            ValueAnimator animator = ValueAnimator.ofInt(currentHeight, targetHeight);
+            animator.setDuration(450); // 调整为 450ms，在慢与快之间取得平衡
+            animator.setInterpolator(new AccelerateDecelerateInterpolator());
+            animator.addUpdateListener(animation -> {
+                int val = (int) animation.getAnimatedValue();
+                ViewGroup.LayoutParams lp = bar.getLayoutParams();
+                if (lp != null) {
+                    lp.height = val;
+                    bar.setLayoutParams(lp);
+                }
+            });
+            animator.start();
+            mVisualizerAnimators.add(animator);
+        }
+
+        mMusicVisualizerContainer.removeCallbacks(mVisualizerRunnable);
+        mMusicVisualizerContainer.postDelayed(mVisualizerRunnable, 450); // 延迟时间与动画时长匹配
+    }
+
+    private final Runnable mVisualizerRunnable = new Runnable() {
+        @Override
+        public void run() {
+            updateMusicVisualizerVisibility();
+        }
+    };
 
     @Override
     public void onClick(View v) {
