@@ -103,6 +103,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         super.onResume();
         mLyricUpdateHandler.post(mLyricUpdateRunnable);
         updateAllCardsAlpha(getView());
+        ThemeUtils.applyToViewTree(getView(), ThemeUtils.getThemeColor());
     }
 
     @Override

@@ -3,6 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/action_refresh_bg"
+        android:icon="@drawable/ic_refresh"
+        android:title="刷新背景"
+        app:showAsAction="always"
+        android:visible="false"/>
+
+    <item
         android:id="@+id/action_music_control"
         android:icon="@drawable/ic_play_arrow"
         android:title="播放/暂停"

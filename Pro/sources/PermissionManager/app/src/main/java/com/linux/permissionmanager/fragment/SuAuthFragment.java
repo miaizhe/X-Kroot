@@ -219,5 +219,6 @@ public class SuAuthFragment extends Fragment {
     public void onResume() {
         super.onResume();
         updateAllCardsAlpha(getView());
+        ThemeUtils.applyToViewTree(getView(), ThemeUtils.getThemeColor());
     }
 }

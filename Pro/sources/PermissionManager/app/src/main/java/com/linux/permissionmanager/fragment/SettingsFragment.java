@@ -66,6 +66,8 @@ public class SettingsFragment extends Fragment {
     private Button mBtnClearLogPath;
     private com.google.android.material.slider.Slider mCardAlphaSlider;
     private TextView mTvCardAlphaValue;
+    private com.google.android.material.slider.Slider mBgAlphaSlider;
+    private TextView mTvBgAlphaValue;
     private LinearLayout mThemeColorsContainer;
 
     // Update component
@@ -112,6 +114,8 @@ public class SettingsFragment extends Fragment {
         mBtnClearLogPath = view.findViewById(R.id.clear_log_path_btn);
         mCardAlphaSlider = view.findViewById(R.id.card_alpha_slider);
         mTvCardAlphaValue = view.findViewById(R.id.card_alpha_value_tv);
+        mBgAlphaSlider = view.findViewById(R.id.bg_alpha_slider);
+        mTvBgAlphaValue = view.findViewById(R.id.bg_alpha_value_tv);
         mThemeColorsContainer = view.findViewById(R.id.theme_colors_container);
 
         // Update component
@@ -189,6 +193,17 @@ public class SettingsFragment extends Fragment {
             AppSettings.setFloat("card_alpha", value);
             mTvCardAlphaValue.setText(String.format("%.2f", value));
             updateAllCardsAlpha(getView());
+        });
+
+        float currentBgAlpha = AppSettings.getFloat("background_alpha", 0.5f);
+        mBgAlphaSlider.setValue(currentBgAlpha);
+        mTvBgAlphaValue.setText(String.format("%.2f", currentBgAlpha));
+        mBgAlphaSlider.addOnChangeListener((slider, value, fromUser) -> {
+            AppSettings.setFloat("background_alpha", value);
+            mTvBgAlphaValue.setText(String.format("%.2f", value));
+            if (mActivity instanceof MainActivity) {
+                ((MainActivity) mActivity).updateBackgroundAlpha();
+            }
         });
 
         initThemeColorPicker();
@@ -543,7 +558,10 @@ public class SettingsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        updateBgMusicStatus();
+        updateLyricFileStatus();
         updateAllCardsAlpha(getView());
+        ThemeUtils.applyToViewTree(getView(), ThemeUtils.getThemeColor());
     }
 
     private void makeUnderline(TextView tv) {

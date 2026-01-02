@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private BottomNavigationView mBottomNavigation;
     private MenuItem mMainMenu;
     private MenuItem mMusicMenu;
+    private MenuItem mRefreshBgMenu;
     private HomeFragment mHomeFragm = null;
     private SuAuthFragment mSuAuthFragm = null;
     private SkrModFragment mSkrModFragm = null;
@@ -98,12 +99,26 @@ public class MainActivity extends AppCompatActivity {
         BackgroundMusicManager.getInstance(this).setOnStateChangedListener(musicStateListener);
     }
 
+    public void updateBackgroundAlpha() {
+        View overlay = findViewById(R.id.main_background_overlay);
+        if (overlay != null) {
+            float alpha = AppSettings.getFloat("background_alpha", 0.5f);
+            overlay.setAlpha(alpha);
+        }
+    }
+
     public void updateBackground() {
         String bgPath = AppSettings.getString("background_path", "");
         View iv = findViewById(R.id.main_background_iv);
         View overlay = findViewById(R.id.main_background_overlay);
         View toolbar = findViewById(R.id.toolbar);
         View nav = findViewById(R.id.bottom_navigation);
+
+        if (mBottomNavigation == null && nav instanceof BottomNavigationView) {
+            mBottomNavigation = (BottomNavigationView) nav;
+        }
+        
+        updateMenuVisibility();
         
         // Handle system bar icons color based on theme
         boolean isDarkMode = (getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK) 
@@ -129,6 +144,10 @@ public class MainActivity extends AppCompatActivity {
         } else {
             iv.setVisibility(View.VISIBLE);
             overlay.setVisibility(View.VISIBLE);
+            
+            float alpha = AppSettings.getFloat("background_alpha", 0.5f);
+            overlay.setAlpha(alpha);
+            
             if (toolbar != null) toolbar.setBackgroundColor(android.graphics.Color.TRANSPARENT);
             if (nav != null) nav.setBackgroundColor(android.graphics.Color.TRANSPARENT);
             
@@ -217,18 +236,31 @@ public class MainActivity extends AppCompatActivity {
             } else if (checkedId == R.id.rb_settings) {
                 selectedFragment = mSettingsFragm;
             }
-            if (mMainMenu != null) {
-                mMainMenu.setVisible(checkedId == R.id.rb_su_auth || checkedId == R.id.rb_skr_mod);
-            }
+            
             if (selectedFragment != null) {
                 getSupportFragmentManager().beginTransaction()
                         .setCustomAnimations(R.anim.fragment_enter, R.anim.fragment_exit)
                         .replace(R.id.frame_layout, selectedFragment)
                         .commitNow();
+                updateMenuVisibility();
                 return true;
             }
             return false;
         });
+    }
+
+    private void updateMenuVisibility() {
+        if (mBottomNavigation == null) return;
+        int checkedId = mBottomNavigation.getSelectedItemId();
+        
+        if (mMainMenu != null) {
+            mMainMenu.setVisible(checkedId == R.id.rb_su_auth || checkedId == R.id.rb_skr_mod);
+        }
+
+        if (mRefreshBgMenu != null) {
+            String bgPath = AppSettings.getString("background_path", "");
+            mRefreshBgMenu.setVisible(!bgPath.isEmpty());
+        }
     }
 
     @Override
@@ -236,7 +268,9 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         mMainMenu = menu.findItem(R.id.action_add);
         mMusicMenu = menu.findItem(R.id.action_music_control);
+        mRefreshBgMenu = menu.findItem(R.id.action_refresh_bg);
         updateMusicMenuIcon();
+        updateMenuVisibility();
         return true;
     }
 
@@ -246,6 +280,9 @@ public class MainActivity extends AppCompatActivity {
             View anchor = findViewById(R.id.toolbar).findViewById(R.id.action_add);
             if (anchor == null) anchor = findViewById(R.id.toolbar);
             showMainPopupMenu(anchor);
+            return true;
+        } else if (item.getItemId() == R.id.action_refresh_bg) {
+            updateBackground();
             return true;
         } else if (item.getItemId() == R.id.action_music_control) {
             BackgroundMusicManager manager = BackgroundMusicManager.getInstance(this);
