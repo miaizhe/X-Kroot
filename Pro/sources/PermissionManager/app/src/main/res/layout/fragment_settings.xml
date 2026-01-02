@@ -499,6 +499,25 @@
                 android:padding="16dp">
 
                 <TextView
+                    style="@style/LargeText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="SKRoot (Pro)" />
+
+                <TextView
+                    style="@style/MediumText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="新一代内核级 Root 解决方案，支持热修改 Hook 内核，完美隐藏 Root 权限，无感运行。" />
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="12dp" />
+
+                <TextView
                     android:id="@+id/about_ver_tv"
                     style="@style/MediumText"
                     android:layout_width="wrap_content"

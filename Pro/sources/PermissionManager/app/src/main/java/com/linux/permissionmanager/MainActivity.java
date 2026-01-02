@@ -262,6 +262,14 @@ public class MainActivity extends AppCompatActivity {
         mSuAuthFragm = new SuAuthFragment(this);
         mSkrModFragm = new SkrModFragment(this);
         mSettingsFragm = new SettingsFragment(this);
+
+        // Pass root key to fragments if it exists
+        if (mRootKey != null && !mRootKey.isEmpty()) {
+            mHomeFragm.setRootKey(mRootKey);
+            mSuAuthFragm.setRootKey(mRootKey);
+            mSkrModFragm.setRootKey(mRootKey);
+        }
+
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.frame_layout, mHomeFragm)
                 .commit();

@@ -39,6 +39,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private EditText console_edit;
     private View mLyricCard;
     private TextView mLyricTv;
+    private TextView mSkrootStatusVal;
+    private TextView mKernelVerVal;
+    private TextView mModuleCountVal;
+    private TextView mSuAppCountVal;
     private List<LyricUtils.LyricEntry> mLyrics;
     private String mCurrentLyricUriStr = "";
     
@@ -66,6 +70,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        mRootKey = AppSettings.getString("rootKey", mRootKey);
         lastInputCmd = AppSettings.getString("lastInputCmd", lastInputCmd);
         lastInputRootExecPath = AppSettings.getString("lastInputRootExecPath", lastInputRootExecPath);
 
@@ -80,6 +85,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         console_edit = view.findViewById(R.id.console_edit);
         mLyricCard = view.findViewById(R.id.lyric_card);
         mLyricTv = view.findViewById(R.id.lyric_tv);
+        mSkrootStatusVal = view.findViewById(R.id.skroot_status_val);
+        mKernelVerVal = view.findViewById(R.id.kernel_ver_val);
+        mModuleCountVal = view.findViewById(R.id.module_count_val);
+        mSuAppCountVal = view.findViewById(R.id.su_app_count_val);
 
         install_skroot_env_btn.setOnClickListener(this);
         uninstall_skroot_env_btn.setOnClickListener(this);
@@ -94,8 +103,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     }
 
     public void setRootKey(String rootKey) {
-        mRootKey = rootKey;
+        this.mRootKey = rootKey;
         showSkrootStatus();
+        updateKernelInfo();
     }
 
     @Override
@@ -103,7 +113,51 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         super.onResume();
         mLyricUpdateHandler.post(mLyricUpdateRunnable);
         updateAllCardsAlpha(getView());
+        updateKernelInfo();
         ThemeUtils.applyToViewTree(getView(), ThemeUtils.getThemeColor());
+    }
+
+    private void updateKernelInfo() {
+        if (mSkrootStatusVal == null) return;
+
+        // 1. Root 状态
+        String curState = NativeBridge.getSkrootEnvState(mRootKey);
+        if (curState.contains("Running")) {
+            mSkrootStatusVal.setText("运行中");
+            mSkrootStatusVal.setTextColor(ThemeUtils.getThemeColor());
+        } else if (curState.contains("NotInstalled")) {
+            mSkrootStatusVal.setText("未安装");
+            mSkrootStatusVal.setTextColor(android.graphics.Color.GRAY);
+        } else {
+            mSkrootStatusVal.setText("故障");
+            mSkrootStatusVal.setTextColor(android.graphics.Color.RED);
+        }
+
+        // 2. 内核版本 - 仅显示系统 Linux 内核版本
+        String osVer = System.getProperty("os.version");
+        if (osVer != null && !osVer.isEmpty()) {
+            mKernelVerVal.setText(osVer);
+        } else {
+            mKernelVerVal.setText("-");
+        }
+
+        // 3. 模块数量
+        try {
+            String jsonAll = NativeBridge.getSkrootModuleList(mRootKey, false);
+            org.json.JSONArray modules = new org.json.JSONArray(jsonAll);
+            mModuleCountVal.setText(String.valueOf(modules.length()));
+        } catch (Exception e) {
+            mModuleCountVal.setText("0");
+        }
+
+        // 4. 授权应用数量
+        try {
+            String jsonSu = NativeBridge.getSuAuthList(mRootKey);
+            org.json.JSONArray suApps = new org.json.JSONArray(jsonSu);
+            mSuAppCountVal.setText(String.valueOf(suApps.length()));
+        } catch (Exception e) {
+            mSuAppCountVal.setText("0");
+        }
     }
 
     @Override

@@ -181,7 +181,9 @@ public class ThemeUtils {
         // 关键 ID 检查
         int id = tv.getId();
         if (id == R.id.link_tv || id == R.id.core_update_found_tv || 
-            id == R.id.lyric_tv || id == R.id.app_name_tv || id == R.id.name_tv) {
+            id == R.id.lyric_tv || id == R.id.app_name_tv || id == R.id.name_tv ||
+            id == R.id.skroot_status_val || id == R.id.kernel_ver_val || 
+            id == R.id.module_count_val || id == R.id.su_app_count_val) {
             return true;
         }
         
