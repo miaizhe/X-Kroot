@@ -62,6 +62,7 @@ public class SettingsFragment extends Fragment {
     private Button mBtnPickBgMusic;
     private Button mBtnClearBgMusic;
     private MaterialSwitch mSwitchShowLyrics;
+    private MaterialSwitch mSwitchAdaptiveBg;
     private TextView mTvLyricFileStatus;
     private Button mBtnPickLyricFile;
     private Button mBtnClearLyricFile;
@@ -110,6 +111,7 @@ public class SettingsFragment extends Fragment {
         mBtnPickBgMusic = view.findViewById(R.id.pick_bg_music_btn);
         mBtnClearBgMusic = view.findViewById(R.id.clear_bg_music_btn);
         mSwitchShowLyrics = view.findViewById(R.id.show_lyrics_switch);
+        mSwitchAdaptiveBg = view.findViewById(R.id.adaptive_bg_switch);
         mTvLyricFileStatus = view.findViewById(R.id.lyric_file_status_tv);
         mBtnPickLyricFile = view.findViewById(R.id.pick_lyric_file_btn);
         mBtnClearLyricFile = view.findViewById(R.id.clear_lyric_file_btn);
@@ -174,6 +176,14 @@ public class SettingsFragment extends Fragment {
         mSwitchShowLyrics.setChecked(AppSettings.getBoolean("show_lyrics", false));
         mSwitchShowLyrics.setOnCheckedChangeListener((v, isChecked) -> {
             AppSettings.setBoolean("show_lyrics", isChecked);
+        });
+
+        mSwitchAdaptiveBg.setChecked(AppSettings.getBoolean("adaptive_background", false));
+        mSwitchAdaptiveBg.setOnCheckedChangeListener((v, isChecked) -> {
+            AppSettings.setBoolean("adaptive_background", isChecked);
+            if (mActivity instanceof MainActivity) {
+                ((MainActivity) mActivity).updateBackground();
+            }
         });
 
         mBtnPickLyricFile.setOnClickListener(v -> pickLyricFile());
@@ -290,6 +300,7 @@ public class SettingsFragment extends Fragment {
         initThemeColorPicker(); // Refresh to show selection
         if (mActivity instanceof MainActivity) {
             ThemeUtils.applyTheme(mActivity);
+            ((MainActivity) mActivity).updateBackground();
             // Also need to refresh fragments
             refreshAllFragmentsTheme();
         }
@@ -374,10 +385,12 @@ public class SettingsFragment extends Fragment {
         builder.show();
     }
 
-    private void refreshAllFragmentsTheme() {
+    public void refreshAllFragmentsTheme() {
         // This is a bit tricky, but since ThemeUtils.applyToViewTree works on any view
         // we can just apply it to the root view of the current fragment
         ThemeUtils.applyToViewTree(getView(), ThemeUtils.getThemeColor());
+        // Also refresh color picker to show current selected color
+        initThemeColorPicker();
     }
 
     private void showSelectTestSkrootBasicsDlg() {

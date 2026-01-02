@@ -202,6 +202,25 @@ public class ThemeUtils {
                Math.abs(b1 - b2) < threshold;
     }
     
+    public static int getAdaptiveBackgroundColor(Context context, int themeColor) {
+        boolean isDarkMode = (context.getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK) 
+                == android.content.res.Configuration.UI_MODE_NIGHT_YES;
+        
+        if (isDarkMode) {
+            // Dark mode adaptive background: very dark version of the theme color
+            return Color.argb(255, 
+                (int)(Color.red(themeColor) * 0.05 + 18 * 0.95),
+                (int)(Color.green(themeColor) * 0.05 + 18 * 0.95),
+                (int)(Color.blue(themeColor) * 0.05 + 18 * 0.95));
+        } else {
+            // Light mode adaptive background: very light version of the theme color
+            return Color.argb(255, 
+                (int)(Color.red(themeColor) * 0.05 + 245 * 0.95),
+                (int)(Color.green(themeColor) * 0.05 + 245 * 0.95),
+                (int)(Color.blue(themeColor) * 0.05 + 245 * 0.95));
+        }
+    }
+
     private static int getSurfaceColorWithTint(int color) {
         // Simple surface tint logic: mix surface color with a bit of primary color
         return Color.argb(255, 

@@ -32,6 +32,14 @@ import com.linux.permissionmanager.utils.GetSdcardPermissionsHelper;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.linux.permissionmanager.utils.BackgroundMusicManager;
 import com.linux.permissionmanager.utils.ThemeUtils;
+import androidx.palette.graphics.Palette;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 
 public class MainActivity extends AppCompatActivity {
     private String mRootKey = "";
@@ -134,9 +142,15 @@ public class MainActivity extends AppCompatActivity {
         if (bgPath.isEmpty()) {
             iv.setVisibility(View.GONE);
             overlay.setVisibility(View.GONE);
-            getWindow().getDecorView().setBackgroundColor(backgroundColor);
-            if (toolbar != null) toolbar.setBackgroundResource(R.color.surface);
-            if (nav != null) nav.setBackgroundResource(R.color.surface);
+            
+            int finalBgColor = backgroundColor;
+            if (AppSettings.getBoolean("adaptive_background", false)) {
+                finalBgColor = ThemeUtils.getAdaptiveBackgroundColor(this, ThemeUtils.getThemeColor());
+            }
+            
+            getWindow().getDecorView().setBackgroundColor(finalBgColor);
+            if (toolbar != null) toolbar.setBackgroundColor(finalBgColor);
+            if (nav != null) nav.setBackgroundColor(finalBgColor);
             
             // In light mode with white background, icons should be dark
             controller.setAppearanceLightStatusBars(!isDarkMode);
@@ -165,26 +179,53 @@ public class MainActivity extends AppCompatActivity {
             }
 
             Glide.with(this)
+                    .asBitmap()
                     .load(bgPath.trim())
                     .diskCacheStrategy(strategy)
                     .skipMemoryCache(bgPath.startsWith("http"))
                     .centerCrop()
                     .timeout(60000)
-                    .listener(new com.bumptech.glide.request.RequestListener<android.graphics.drawable.Drawable>() {
+                    .into(new CustomTarget<Bitmap>() {
                         @Override
-                        public boolean onLoadFailed(@androidx.annotation.Nullable com.bumptech.glide.load.engine.GlideException e, Object model, com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable> target, boolean isFirstResource) {
-                            Log.e("MainActivity", "Glide load failed: " + (e != null ? e.getMessage() : "unknown error"));
-                            if (e != null) e.logRootCauses("MainActivity");
-                            return false;
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                            Log.d("MainActivity", "Glide bitmap load success");
+                            ((android.widget.ImageView) iv).setImageBitmap(resource);
+                            
+                            // Extract color from image if adaptive background is enabled
+                            if (AppSettings.getBoolean("adaptive_background", false)) {
+                                Palette.from(resource).generate(palette -> {
+                                    if (palette != null) {
+                                        // Prefer Vibrant or Muted colors
+                                        int color = palette.getVibrantColor(
+                                            palette.getMutedColor(
+                                                palette.getDominantColor(ThemeUtils.DEFAULT_PRIMARY_COLOR)
+                                            )
+                                        );
+                                        
+                                        Log.d("MainActivity", "Extracted color: " + String.format("#%06X", (0xFFFFFF & color)));
+                                        
+                                        // Apply the extracted color as theme color
+                                        ThemeUtils.setThemeColor(color);
+                                        ThemeUtils.applyTheme(MainActivity.this);
+                                        
+                                        // Notify fragments to refresh theme
+                                        if (mSettingsFragm != null && mSettingsFragm.isAdded()) {
+                                            mSettingsFragm.refreshAllFragmentsTheme();
+                                        }
+                                    }
+                                });
+                            }
                         }
 
                         @Override
-                        public boolean onResourceReady(android.graphics.drawable.Drawable resource, Object model, com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable> target, com.bumptech.glide.load.DataSource dataSource, boolean isFirstResource) {
-                            Log.d("MainActivity", "Glide load success");
-                            return false;
+                        public void onLoadCleared(@Nullable Drawable placeholder) {
                         }
-                    })
-                    .into((android.widget.ImageView) iv);
+
+                        @Override
+                        public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                            Log.e("MainActivity", "Glide load failed");
+                        }
+                    });
         }
     }
 
