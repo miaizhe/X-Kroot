@@ -12,7 +12,7 @@
 ## 效果：
 * 实验设备包括：红米K20\K30\K40\K50\K60、小米8\9\10\11\12\13、小米平板5\6、红魔5\6\7、联想、三星、一加、ROG2\3等，支持型号非常多。测试结果显示，SKRoot能够在设备上**非常稳定**的运行。
 * **过市面上所有主流APP的ROOT检测，如农业XX、交X12XX3等...**
-* **不需要Linux内核源码**
+* **不需要Linux内核源码、不编译内核，直接修补内核，保留原厂内核优化**
 * **支持Linux内核版本：3.10~6.6**
 
 ![image](https://github.com/abcz316/SKRoot-linuxKernelRoot/blob/master/Lite_version/%E5%8A%9F%E8%83%BD%E6%88%AA%E5%9B%BE/1.png)
@@ -25,13 +25,16 @@
 2. 其中【**注入su到指定进程**】**只支持授权su到64位的APP**，老式32位APP不再进行支持，因市面上几乎所有APP都是64位，例如MT文件管理器、Root Explorer文件管理器等等。
 
 ## 使用流程：
-1.编译产物下载： [patch_kernel_root.exe](https://github.com/abcz316/SKRoot-linuxKernelRoot/blob/master/Lite_version/build/patch_kernel_root(2025-12-15).exe)、 [PermissionManager.apk](https://github.com/abcz316/SKRoot-linuxKernelRoot/blob/master/Lite_version/build/PermissionManager(2025-12-15).apk)
+1.编译产物下载： [patch_kernel_root.exe](https://github.com/abcz316/SKRoot-linuxKernelRoot/blob/master/Lite_version/build/patch_kernel_root(2026-1-3).exe)、 [PermissionManager.apk](https://github.com/abcz316/SKRoot-linuxKernelRoot/blob/master/Lite_version/build/PermissionManager(2025-12-15).apk)
 
 2.将内核kernel文件拖拽置`patch_kernel_root.exe`即可一键自动化流程补丁内核，同时会自动生成ROOT密匙。
 
 3.安装并启动`PermissionManager.apk`或者`testRoot`，输入ROOT密匙值，开始享受舒爽的ROOT环境。
 
 ## 更新日志：
+2026-1：
+  * **1.修复审计日志残留痕迹**
+
 2025：
   * **1.适配Linux6.12**
   * **2.修复su部分命令无法执行的问题。**
@@ -69,3 +72,6 @@
 * **如果在解锁BL后手机会发出警报，你需要自行解决这个问题，因为它与SKRoot无关。**
 * **如果对方是检测BL锁，而不是ROOT权限。你应该安装SKRoot的隐藏BL锁模块。**
 * **请检查SELinux状态是否被恶意软件禁用。**
+
+3、耗电风险须知：
+* **我们不提倡任何自行编译内核的行为，该操作可能会丢失原厂的功耗管理策略，造成续航大幅缩短等问题，Skroot是在原厂内核上进行修补，原汁原味保留原厂调教，无任何耗电问题。**

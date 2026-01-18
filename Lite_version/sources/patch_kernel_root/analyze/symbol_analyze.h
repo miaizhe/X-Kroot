@@ -19,7 +19,7 @@ struct KernelSymbolOffset {
 	size_t _stext = 0;
 	SymbolRegion die = { 0 };
 	SymbolRegion arm64_notify_die = { 0 };
-	SymbolRegion drm_dev_printk = { 0 };
+	SymbolRegion __drm_printfn_coredump = { 0 };
 
 	size_t __do_execve_file = 0;
 	size_t do_execveat_common = 0;
@@ -28,6 +28,7 @@ struct KernelSymbolOffset {
 	size_t do_execve = 0;
 
 	SymbolRegion avc_denied = { 0 };
+	size_t audit_log_start = { 0 };
 	size_t filldir64 = 0;
 
 	SymbolRegion sys_getuid = { 0 };

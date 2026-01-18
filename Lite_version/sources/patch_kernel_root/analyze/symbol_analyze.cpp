@@ -48,7 +48,7 @@ bool SymbolAnalyze::find_symbol_offset() {
 	m_sym_offset._stext = find_addr({{"_stext", false}});
 	m_sym_offset.die = find_region({{"die", false}});
 	m_sym_offset.arm64_notify_die = find_region({{"arm64_notify_die", false}});
-	m_sym_offset.drm_dev_printk = find_region({{"drm_dev_printk", false}});
+	m_sym_offset.__drm_printfn_coredump = find_region({{"__drm_printfn_coredump", false}});
 
 	m_sym_offset.__do_execve_file = find_addr({{"__do_execve_file", false}});
 	m_sym_offset.do_execveat_common = find_addr({
@@ -66,6 +66,8 @@ bool SymbolAnalyze::find_symbol_offset() {
 		{"avc_denied", false},
 		{"avc_denied", true},
 		});
+
+	m_sym_offset.audit_log_start = find_addr({ {"audit_log_start", false} });
 
 	m_sym_offset.filldir64 = find_addr({
 		{"filldir64", false},
@@ -95,6 +97,7 @@ bool SymbolAnalyze::find_symbol_offset() {
 
 	return (m_sym_offset.do_execve || m_sym_offset.do_execveat || m_sym_offset.do_execveat_common) 
 		&& m_sym_offset.avc_denied.valid()
+		&& m_sym_offset.audit_log_start
 		&& m_sym_offset.filldir64
 		&& m_sym_offset.sys_getuid.valid()
 		&& m_sym_offset.prctl_get_seccomp.valid();
@@ -105,7 +108,7 @@ void SymbolAnalyze::printf_symbol_offset() {
 	std::cout << "_stext:" << m_sym_offset._stext << std::endl;
 	if (m_sym_offset.die) std::cout << "die:" << m_sym_offset.die.offset << ", size:" << m_sym_offset.die.size << std::endl;
 	if (m_sym_offset.arm64_notify_die) std::cout << "arm64_notify_die:" << m_sym_offset.arm64_notify_die.offset << ", size:" << m_sym_offset.arm64_notify_die.size << std::endl;
-	if (m_sym_offset.drm_dev_printk) std::cout << "drm_dev_printk:" << m_sym_offset.drm_dev_printk.offset << ", size:" << m_sym_offset.drm_dev_printk.size << std::endl;
+	if (m_sym_offset.__drm_printfn_coredump) std::cout << "__drm_printfn_coredump:" << m_sym_offset.__drm_printfn_coredump.offset << ", size:" << m_sym_offset.__drm_printfn_coredump.size << std::endl;
 
 	std::cout << "__do_execve_file:" << m_sym_offset.__do_execve_file << std::endl;
 	std::cout << "do_execveat_common:" << m_sym_offset.do_execveat_common << std::endl;
@@ -114,6 +117,7 @@ void SymbolAnalyze::printf_symbol_offset() {
 	std::cout << "do_execve:" << m_sym_offset.do_execve << std::endl;
 
 	std::cout << "avc_denied:" << m_sym_offset.avc_denied.offset << ", size:" << m_sym_offset.avc_denied.size << std::endl;
+	std::cout << "audit_log_start:" << m_sym_offset.audit_log_start << std::endl;
 	std::cout << "filldir64:" << m_sym_offset.filldir64 << std::endl;
 
 	std::cout << "sys_getuid:" << m_sym_offset.sys_getuid.offset << ", size:" << m_sym_offset.sys_getuid.size << std::endl;

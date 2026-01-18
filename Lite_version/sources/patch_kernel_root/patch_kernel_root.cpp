@@ -2,7 +2,9 @@
 #include "analyze/base_func.h"
 #include "analyze/symbol_analyze.h"
 #include "patch_do_execve.h"
+#include "patch_current_avc_check.h"
 #include "patch_avc_denied.h"
+#include "patch_audit_log_start.h"
 #include "patch_filldir64.h"
 
 #include "3rdparty/find_mrs_register.h"
@@ -89,33 +91,38 @@ PatchKernelResult patch_kernel_handler(const std::vector<char>& file_buf, size_t
 	KernelVersionParser kernel_ver(file_buf);
 	PatchBase patchBase(file_buf, cred_uid_offset);
 	PatchDoExecve patchDoExecve(patchBase, sym);
+	PatchCurrentAvcCheck patchCurrentAvcCheck(patchBase);
 	PatchAvcDenied patchAvcDenied(patchBase, sym.avc_denied);
+	PatchAuditLogStart patchAuditLogStart(patchBase, sym.audit_log_start);
 	PatchFilldir64 patchFilldir64(patchBase, sym.filldir64);
 
 	bool patched = true;
 	PatchKernelResult r;
-	if (kernel_ver.is_kernel_version_less("5.5.0")) {
+	if (kernel_ver.is_kernel_version_less("6.1.0")) {
 		SymbolRegion next_hook_start_region = { 0x200, 0x300 };
+		if (sym.__cfi_check.offset) next_hook_start_region = sym.__cfi_check;
+		auto start_b_location = next_hook_start_region.offset;
+		PATCH_AND_CONSUME(next_hook_start_region, 4);
 		r.root_key_start = next_hook_start_region.offset;
 		PATCH_AND_CONSUME(next_hook_start_region, patchDoExecve.patch_do_execve(next_hook_start_region, cred_offset, seccomp_offset, vec_patch_bytes_data));
 		PATCH_AND_CONSUME(next_hook_start_region, patchFilldir64.patch_filldir64_root_key_guide(r.root_key_start, next_hook_start_region, vec_patch_bytes_data));
 		PATCH_AND_CONSUME(next_hook_start_region, patchFilldir64.patch_filldir64_core(next_hook_start_region, vec_patch_bytes_data));
-		PATCH_AND_CONSUME(next_hook_start_region, patchAvcDenied.patch_avc_denied(next_hook_start_region, cred_offset, vec_patch_bytes_data));
-	} else if (kernel_ver.is_kernel_version_less("6.0.0") && sym.__cfi_check.offset) {
-		SymbolRegion next_hook_start_region = sym.__cfi_check;
-		r.root_key_start = next_hook_start_region.offset;
-		PATCH_AND_CONSUME(next_hook_start_region, patchDoExecve.patch_do_execve(next_hook_start_region, cred_offset, seccomp_offset, vec_patch_bytes_data));
-		PATCH_AND_CONSUME(next_hook_start_region, patchFilldir64.patch_filldir64_root_key_guide(r.root_key_start, next_hook_start_region, vec_patch_bytes_data));
-		PATCH_AND_CONSUME(next_hook_start_region, patchFilldir64.patch_filldir64_core(next_hook_start_region, vec_patch_bytes_data));
-		PATCH_AND_CONSUME(next_hook_start_region, patchAvcDenied.patch_avc_denied(next_hook_start_region, cred_offset, vec_patch_bytes_data));
-	} else if (sym.die.offset && sym.arm64_notify_die.offset && sym.drm_dev_printk.offset) {
-		PATCH_AND_CONSUME(sym.drm_dev_printk, patch_ret_cmd(file_buf, sym.drm_dev_printk.offset, vec_patch_bytes_data));
+		auto current_avc_check_bl_func = next_hook_start_region.offset;
+		PATCH_AND_CONSUME(next_hook_start_region, patchCurrentAvcCheck.patch_current_avc_check_bl_func(next_hook_start_region, cred_offset, vec_patch_bytes_data));
+		PATCH_AND_CONSUME(next_hook_start_region, patchAvcDenied.patch_avc_denied(next_hook_start_region, current_avc_check_bl_func, vec_patch_bytes_data));
+		PATCH_AND_CONSUME(next_hook_start_region, patchAuditLogStart.patch_audit_log_start(next_hook_start_region, current_avc_check_bl_func, vec_patch_bytes_data));
+		auto end_b_location = next_hook_start_region.offset;
+		patchBase.patch_jump(start_b_location, end_b_location, vec_patch_bytes_data);
+	} else if (sym.die.offset && sym.arm64_notify_die.offset && sym.__drm_printfn_coredump.offset) {
 		r.root_key_start = sym.die.offset;
 		PATCH_AND_CONSUME(sym.die, patchDoExecve.patch_do_execve(sym.die, cred_offset, seccomp_offset, vec_patch_bytes_data));
 		PATCH_AND_CONSUME(sym.die, patchFilldir64.patch_filldir64_root_key_guide(r.root_key_start, sym.die, vec_patch_bytes_data));
 		PATCH_AND_CONSUME(sym.die, patchFilldir64.patch_jump(sym.die.offset, sym.arm64_notify_die.offset, vec_patch_bytes_data));
 		PATCH_AND_CONSUME(sym.arm64_notify_die, patchFilldir64.patch_filldir64_core(sym.arm64_notify_die, vec_patch_bytes_data));
-		PATCH_AND_CONSUME(sym.drm_dev_printk, patchAvcDenied.patch_avc_denied(sym.drm_dev_printk, cred_offset, vec_patch_bytes_data));
+		auto current_avc_check_bl_func = sym.__drm_printfn_coredump.offset;
+		PATCH_AND_CONSUME(sym.__drm_printfn_coredump, patchCurrentAvcCheck.patch_current_avc_check_bl_func(sym.__drm_printfn_coredump, cred_offset, vec_patch_bytes_data));
+		PATCH_AND_CONSUME(sym.__drm_printfn_coredump, patchAvcDenied.patch_avc_denied(sym.__drm_printfn_coredump, current_avc_check_bl_func, vec_patch_bytes_data));
+		PATCH_AND_CONSUME(sym.__drm_printfn_coredump, patchAuditLogStart.patch_audit_log_start(sym.__drm_printfn_coredump, current_avc_check_bl_func, vec_patch_bytes_data));
 	} else {
 		patched = false;
 	}
@@ -140,7 +147,7 @@ int main(int argc, char* argv[]) {
 	++argv;
 	--argc;
 
-	std::cout << "本工具用于生成SKRoot(Lite) ARM64 Linux内核ROOT提权代码 V10" << std::endl << std::endl;
+	std::cout << "本工具用于生成SKRoot(Lite) ARM64 Linux内核ROOT提权代码 V11" << std::endl << std::endl;
 
 #ifdef _DEBUG
 #else
@@ -155,6 +162,7 @@ int main(int argc, char* argv[]) {
 #else
 	const char* file_path = argv[0];
 #endif
+	std::cout << file_path << std::endl << std::endl;
 	if (!check_file_path(file_path)) {
 		std::cout << "Please enter the correct Linux kernel binary file path. " << std::endl;
 		std::cout << "For example, if it is boot.img, you need to first decompress boot.img and then extract the kernel file inside." << std::endl;
